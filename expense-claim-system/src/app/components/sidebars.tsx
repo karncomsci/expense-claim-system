@@ -2,7 +2,8 @@
 import { MoreVertical, ChevronLast, AlignJustify} from "lucide-react"
 import { useContext, createContext, useState } from "react"
 import Image from "next/image"
-import logo from '@/app/assets/images/nityo-infotech.png'
+import img from '@/app/assets/images/nityo-infotech.png'
+import logo from '@/app/assets/images/logo-nityo.png'
 import { useRouter } from 'next/navigation'
 import { isNumber } from "util"
 interface SidebarContextProps {
@@ -27,7 +28,7 @@ export default function Sidebar({ children }: SidebarProps) {
       <nav className="h-full flex flex-col bg-white border-r shadow-sm">
         <div className="p-4 pb-2 flex justify-between items-center">
           
-          <Image src={logo} alt='' className={`overflow-hidden transition-all ${
+          <Image src={img} alt='' className={`overflow-hidden transition-all ${
               expanded ? "w-32" : "w-0"
             }`}
              width={80} height={80} />
@@ -44,11 +45,7 @@ export default function Sidebar({ children }: SidebarProps) {
         </SidebarContext.Provider>
 
         <div className="border-t flex p-3">
-          <img
-            src="https://ui-avatars.com/api/?background=c7d2fe&color=3730a3&bold=true"
-            alt=""
-            className="w-10 h-10 rounded-md"
-          />
+          <Image src={logo} alt='' className="w-10 h-10 rounded-md"/>
           <div
             className={`
               flex justify-between items-center

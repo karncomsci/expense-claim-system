@@ -42,3 +42,5 @@ next-env.d.ts
 
 #json file
 credentails.json
+
+.env.local

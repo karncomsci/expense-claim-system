@@ -1,4 +1,5 @@
 export interface SheetDataRow {
+    requestId?: string;
     requestDate: string;
     topic: string;
     detail: string;
@@ -8,6 +9,7 @@ export interface SheetDataRow {
     requesterEmail: string;
     approver: string;
     approverEmail: string;
+    receipt:string;
     approvalDate?: string; 
     status: string;
     rejectReason?: string; 

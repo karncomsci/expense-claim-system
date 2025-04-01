@@ -2,7 +2,7 @@ import Image from 'next/image'
 import logo from '@/app/assets/images/nityo-infotech.png'
 
 
-export default function Header() {
+export default function header() {
     return (
         <header>
             <nav className="bg-blue-300 border-gray-200 px-4 lg:px-6 py-2.5 dark:bg-gray-800">
