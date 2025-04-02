@@ -2,11 +2,11 @@
 import { google } from "googleapis";
 import { readFileSync } from 'fs';
 import { join } from 'path';
-import dotenv from "dotenv";
+//import dotenv from "dotenv";
 
-dotenv.config({ path: ".env.production" });
-
+//dotenv.config({ path: ".env.production" });
 export async function getSheetData() { 
+    
 //const credentialsPath = join(process.cwd(), './api-key.json');
 //const credentials = JSON.parse(readFileSync(credentialsPath, 'utf-8'));
 
@@ -21,6 +21,7 @@ const glAuth = await google.auth.getClient({
         universe_domain: process.env.UNIVERSE_DOMAIN,
     },
     scopes: ["https://www.googleapis.com/auth/spreadsheets"],
+    
 });
 
     const glSheets = google.sheets({ version: "v4", auth: glAuth });
@@ -29,6 +30,7 @@ const glAuth = await google.auth.getClient({
         spreadsheetId: process.env.GOOGLE_SHEET_ID_ACTION,
         range: 'Document',
     });
+
 
     return { data: data.data.values };
 }
