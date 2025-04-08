@@ -2,8 +2,7 @@
 import { useState, useEffect,ChangeEvent } from "react";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import { Months } from "@/app/models/Months";
-import mapData from "@/app/mapper/map-data";
-import { getSheetMasterData } from "@/app/api/google-sheets.master";
+import { masterService } from "@/app/services/master-service";
 
 
 
@@ -21,16 +20,17 @@ const SelectDropdown = ({
   const [dataMonth, setDataMonth] = useState<Months[]>([]);
   useEffect(() => {
     const fetchData = async () => {
-      const res = await getSheetMasterData();
-      console.log(res.year);
-      if (res.month && Array.isArray(res.month)) {
-        const month: Months[] = mapData().mapSheetDataMonth(
-          res.month as string[][]
-        );
-        setDataMonth(month);
-      } else {
-        console.error("Invalid data format received:", res.month);
-      }
+      if(localStorage.getItem('month')){
+              const monthData = localStorage.getItem('month');
+              if (monthData) {
+                setDataMonth(JSON.parse(monthData) as Months[]);
+              }
+            }else{
+              masterService()
+              .then(res => {
+                setDataMonth(res.month as Months[]);
+                res.month ? localStorage.setItem('month', JSON.stringify(res.month)) : []})
+            }
         
     };
     fetchData();

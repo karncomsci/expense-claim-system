@@ -4,9 +4,10 @@ import { ExpenseClaimDetail } from "@/app/models/ExpenseClaimDetail";
 
 interface DataTableProps {
     rowData: ExpenseClaimDetail[]; // Accept an array of SheetDataRow objects
+    onClickDeleteItem: (item: string) => void;
 }
 
-export default function TableRequestClaimDetail({ rowData } : DataTableProps) {
+export default function TableRequestClaimDetail({ rowData, onClickDeleteItem } : DataTableProps) {
   const router = useRouter();
 
   return (
@@ -52,7 +53,7 @@ export default function TableRequestClaimDetail({ rowData } : DataTableProps) {
                   {item.to}
                 </td>
                 <td className="px-6 py-4 text-gray-700 border-gray-300 border-1">
-                  {item.receipt}
+                  {item.receiptName}
                 </td>
                 <td className="px-6 py-4 text-gray-700 border-gray-300 border-1">
                   {item.amount}
@@ -62,7 +63,7 @@ export default function TableRequestClaimDetail({ rowData } : DataTableProps) {
                     <button className="p-2 rounded bg-blue-300 hover:bg-blue-500 transition">
                       <FileSearch className="w-5 h-5 text-white" />
                     </button>
-                    <button className="p-2 rounded bg-red-300 hover:bg-red-500 transition">
+                    <button onClick={ () => onClickDeleteItem( item.requestDetailId ? item.requestDetailId : "" ) } className="p-2 rounded bg-red-300 hover:bg-red-500 transition">
                       <Trash2 className="w-5 h-5 text-white" />
                     </button>
                   </div>

@@ -1,10 +1,8 @@
 "use client";
 import { useState, useEffect,ChangeEvent } from "react";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
-import { getSheetMasterData } from "@/app/api/google-sheets.master";
 import { Employees } from "@/app/models/Employees";
-import mapData from "@/app/mapper/map-data";
-//import { ExpenseClaim } from "@/app/models/ExpenseClaim";
+import { masterService } from "@/app/services/master-service";
 
 interface SelectDropdownProps {
   value?: string;
@@ -23,15 +21,16 @@ const SelectDropdown = ({
 
   useEffect(() => {
     const fetchData = async () => {
-      const res = await getSheetMasterData();
-
-      if (res.employee && Array.isArray(res.employee)) {
-        const employee: Employees[] = mapData().mapSheetDataEmployee(
-          res.employee as string[][]
-        );
-        setDataEmployee(employee);
-      }else {
-        console.error("Invalid data format received:", res.employee);
+      if(localStorage.getItem('employee')){
+        const employeeData = localStorage.getItem('employee');
+        if (employeeData) {
+          setDataEmployee(JSON.parse(employeeData) as Employees[]);
+        }
+      }else{
+        masterService()
+        .then(res => {
+          setDataEmployee(res.employee as Employees[]);
+          res.employee ? localStorage.setItem('employee', JSON.stringify(res.employee)) : []})
       }
     }
    

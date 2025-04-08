@@ -1,11 +1,13 @@
 "use client"
 import { MoreVertical, ChevronLast, AlignJustify} from "lucide-react"
-import { useContext, createContext, useState } from "react"
+import { useContext, createContext, useState, useEffect } from "react"
 import Image from "next/image"
 import img from '@/app/assets/images/nityo-infotech.png'
 import logo from '@/app/assets/images/logo-nityo.png'
 import { useRouter } from 'next/navigation'
 import { isNumber } from "util"
+
+
 interface SidebarContextProps {
   expanded: boolean;
   setExpanded?: (expanded: boolean) => void;
@@ -21,6 +23,8 @@ interface SidebarProps {
 }
 export default function Sidebar({ children }: SidebarProps) {
   const [expanded, setExpanded] = useState(true)
+  
+  
   
   
   return (

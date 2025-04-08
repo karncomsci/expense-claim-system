@@ -1,7 +1,8 @@
 "use client"
-import { ReactNode } from "react";
+import { ReactNode,useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Sidebar, { SidebarItem } from "@/app/components/sidebars";
+import { Employees } from "@/app/models/Employees";
 import {
   FolderOpen,
   BriefcaseBusiness,
@@ -16,12 +17,33 @@ export default function MyDocumentsLayout({
 }: {
   children: ReactNode;
 }) {
+  const [user, setUser] = useState<Employees>({
+      employeeId: "",
+      employeeName : "",
+      email :"",
+      position: "",
+      firstName:"",
+      lastName:"",
+      employeeStatus:""
+  });
   const router = useRouter();
   const pathname = usePathname();
+
+  useEffect(() => {
+        const fetchData = async () => {
+          const getUser = localStorage.getItem('login');
+          if (getUser) {
+             setUser(JSON.parse(getUser) as Employees);
+          }
+        };
+        fetchData();
+        
+    }, []);
   return (
     <>
       <div className="flex">
         <Sidebar>
+          <Conditional showWhen={user.employeeStatus === "Approver"}  > 
           <SidebarItem
             icon={<FolderClock size={20} />}
             text="เอกสารรออนุมัติ"
@@ -29,6 +51,7 @@ export default function MyDocumentsLayout({
             count={2}
             path="./"
           />
+          </Conditional>
           <SidebarItem
             icon={<BriefcaseBusiness size={20} />}
             text="เอกสารของฉัน"
@@ -62,4 +85,15 @@ export default function MyDocumentsLayout({
       </div>
     </>
   );
+}
+interface ConditionalProps {
+  showWhen: boolean;
+  children: React.ReactNode;
+}
+function Conditional({ showWhen, children }: ConditionalProps) {
+  if (showWhen) {
+    return <>{children}</>;
+  } else {
+    return null;
+  }
 }

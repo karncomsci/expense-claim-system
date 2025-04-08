@@ -1,9 +1,8 @@
 "use client";
-import { useState, useEffect,ChangeEvent } from "react";
+import { useState, useEffect, ChangeEvent } from "react";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
-import { getSheetMasterData } from "@/app/api/google-sheets.master";
 import { Employees } from "@/app/models/Employees";
-import mapData from "@/app/mapper/map-data";
+import { masterService } from "@/app/services/master-service";
 //import { ExpenseClaim } from "@/app/models/ExpenseClaim";
 
 interface SelectDropdownProps {
@@ -17,36 +16,41 @@ const SelectDropdown = ({
   value,
   onChange,
   type,
-  onSelectChangeEmployee
+  onSelectChangeEmployee,
 }: SelectDropdownProps) => {
   const [dataEmployee, setDataEmployee] = useState<Employees[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
-      const res = await getSheetMasterData();
-
-      if (res.employee && Array.isArray(res.employee)) {
-        const employee: Employees[] = mapData().mapSheetDataApprover(
-          res.employee as string[][]
-        );
-        setDataEmployee(employee);
-      }else {
-        console.error("Invalid data format received:", res.employee);
+      if (localStorage.getItem("approver")) {
+        const approverData = localStorage.getItem("approver");
+        if (approverData) {
+          setDataEmployee(JSON.parse(approverData) as Employees[]);
+        }
+      } else {
+        masterService().then((res) => {
+          setDataEmployee(res.approver as Employees[]);
+          res.approver
+            ? localStorage.setItem("approver", JSON.stringify(res.approver))
+            : [];
+        });
       }
-    }
-   
+    };
+
     fetchData();
   }, []);
 
   const handleChangeEmployee = (event: ChangeEvent<HTMLSelectElement>) => {
     const selectedKey = event.target.value;
-    const selectedItem = dataEmployee.find((item) => item.employeeId === selectedKey);
+    const selectedItem = dataEmployee.find(
+      (item) => item.employeeId === selectedKey
+    );
 
     if (selectedItem) {
       onSelectChangeEmployee(selectedItem); // ส่งค่าไปยัง Parent
     }
-  }
-  
+  };
+
   return (
     <>
       <select

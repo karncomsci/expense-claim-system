@@ -27,6 +27,7 @@ export default function FormAddClaim({
   addItemClaim,
   requestId
 }: DataCategoryDropDownProps) {
+  const [loading, setLoading] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [formData, setFormData] = useState({
@@ -90,8 +91,8 @@ export default function FormAddClaim({
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    addItemClaim(formData);
+    
+    /*addItemClaim(formData);
 
     setFormData({
       requestId: requestId,
@@ -108,7 +109,7 @@ export default function FormAddClaim({
       approvalDate: "",
       status: "New",
       rejectReason: "",
-    });
+    });*/
   };
 
   return (
@@ -423,6 +424,7 @@ export default function FormAddClaim({
           </div>
         </form>
       </div>
+
     </>
   );
 }

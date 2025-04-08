@@ -1,18 +1,44 @@
 "use client";
-import { useState, ChangeEvent, FormEvent } from "react";
-import { ChevronDownIcon } from "@heroicons/react/20/solid";
+import { useState, ChangeEvent, FormEvent, useEffect } from "react";
+import { masterService } from "@/app/services/master-service";
+import SelectDropdownMonth from "./drop-down/month/select-drop-down";
+import SelectDropdownYear from "./drop-down/year/select-drop-down";
+import SelectDropDownEmployeeCompany from "./drop-down/employee-company/select-drop-down";
+import SelectDropDownApprover from "./drop-down/approver/select-drop-down";
+import { ClientNames } from "@/app/models/ClientNames";
+import { Employees } from "@/app/models/Employees";
+import type { SearchExpenseClaim } from "@/app/models/SearchExpenseClaim";
 
-export default function SearchClaim() {
-  const [formData, setFormData] = useState({
+export default function SearchExpenseClaim() {
+  const [formData, setFormData] = useState<SearchExpenseClaim>({
     claimedMonth: "",
     claimedYear: "",
     name: "",
     employeeId: "",
     employeeCompany: "",
-    approver: "",
+    approverId: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState<string>("");
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const master = await masterService();
+      localStorage.setItem(
+        "approver",
+        JSON.stringify(master.approver ? master.approver : [])
+      );
+      localStorage.setItem(
+        "month",
+        JSON.stringify(master.month ? master.month : [])
+      );
+      localStorage.setItem(
+        "year",
+        JSON.stringify(master.year ? master.year : [])
+      );
+    };
+    fetchData();
+  }, []);
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -49,6 +75,26 @@ export default function SearchClaim() {
 
     setIsSubmitting(false);
   };
+  const handleSelectChangeEmployeeCompany = (data: ClientNames) => {
+      if (data) {
+        if (data.clientName) {
+          setFormData((prev) => ({
+            ...prev,
+            employeeCompany: data.clientName,
+          }));
+        }
+      }
+    };
+    const handleSelectChangeApprover = (data: Employees) => {
+        if (data) {
+          if (data.employeeId) {
+            setFormData((prev) => ({
+              ...prev,
+              employeeId: data.employeeId,
+            }));
+          }
+        }
+      };
   return (
     <div className="max-w-full mx-auto p-2 bg-white rounded-lg">
       <h2 className="text-base/7 font-semibold text-gray-900">Search Claim</h2>
@@ -62,31 +108,14 @@ export default function SearchClaim() {
               Claimed Month
             </label>
             <div className="mt-2 grid grid-cols-1">
-              <select
-                id="claimedMonth"
-                name="claimedMonth"
+              <SelectDropdownMonth
                 value={formData.claimedMonth}
-                autoComplete="claimedMonth"
-                onChange={handleChange}
-                className="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white py-1.5 pr-8 pl-3 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-              >
-                <option value="">Select Month</option>
-                <option value="January">January</option>
-                <option value="February">February</option>
-                <option value="March">March</option>
-                <option value="April">April</option>
-                <option value="May">May</option>
-                <option value="June">June</option>
-                <option value="July">July</option>
-                <option value="August">August</option>
-                <option value="September">September</option>
-                <option value="October">October</option>
-                <option value="November">November</option>
-                <option value="December">December</option>
-              </select>
-              <ChevronDownIcon
-                aria-hidden="true"
-                className="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-gray-500 sm:size-4"
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    claimedMonth: e.target.value,
+                  }))
+                }
               />
             </div>
           </div>
@@ -98,22 +127,14 @@ export default function SearchClaim() {
               Claimed Year
             </label>
             <div className="mt-2 grid grid-cols-1">
-              <select
-                id="claimedYear"
-                name="claimedYear"
+              <SelectDropdownYear
                 value={formData.claimedYear}
-                onChange={handleChange}
-                autoComplete="claimedYear"
-                className="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white py-1.5 pr-8 pl-3 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-              >
-                <option value="">Select Year</option>
-                <option value="2025">2025</option>
-                <option value="2026">2026</option>
-                <option value="2027">2027</option>
-              </select>
-              <ChevronDownIcon
-                aria-hidden="true"
-                className="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-gray-500 sm:size-4"
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    claimedYear: e.target.value,
+                  }))
+                }
               />
             </div>
           </div>
@@ -131,7 +152,12 @@ export default function SearchClaim() {
                 name="name"
                 type="text"
                 value={formData.name}
-                onChange={handleChange}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    name: e.target.value,
+                  }))
+                }
                 autoComplete="name"
                 placeholder="Name"
                 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
@@ -151,7 +177,12 @@ export default function SearchClaim() {
                 name="employeeId"
                 type="text"
                 value={formData.employeeId}
-                onChange={handleChange}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    employeeId: e.target.value,
+                  }))
+                }
                 autoComplete="employeeId"
                 placeholder="Employee ID"
                 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
@@ -167,20 +198,15 @@ export default function SearchClaim() {
               Employee Company
             </label>
             <div className="mt-2 grid grid-cols-1">
-              <select
-                id="employeeCompany"
-                name="employeeCompany"
-                value={formData.employeeCompany}
-                onChange={handleChange}
-                autoComplete="employeeCompany"
-                className="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white py-1.5 pr-8 pl-3 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-              >
-                <option value="">Select Company</option>
-                <option value="Nityo">Nityo</option>
-              </select>
-              <ChevronDownIcon
-                aria-hidden="true"
-                className="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-gray-500 sm:size-4"
+            <SelectDropDownEmployeeCompany
+                value={formData?.employeeCompany}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    employeeCompany: e.target.value,
+                  }))
+                }
+                onSelectChangeClientNames={handleSelectChangeEmployeeCompany}
               />
             </div>
           </div>
@@ -192,20 +218,15 @@ export default function SearchClaim() {
               Approver
             </label>
             <div className="mt-2 grid grid-cols-1">
-              <select
-                id="approver"
-                name="approver"
-                value={formData.approver}
-                onChange={handleChange}
-                autoComplete="approver"
-                className="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white py-1.5 pr-8 pl-3 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
-              >
-                <option value="">Select Approver</option>
-                <option value="Sunisa W.">Sunisa W.</option>
-              </select>
-              <ChevronDownIcon
-                aria-hidden="true"
-                className="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-gray-500 sm:size-4"
+            <SelectDropDownApprover
+                value={formData?.approverId}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    approverId: e.target.value,
+                  }))
+                }
+                onSelectChangeEmployee={handleSelectChangeApprover}
               />
             </div>
           </div>
@@ -214,7 +235,7 @@ export default function SearchClaim() {
             <div className="flex justify-center items-center pt-4">
               <button
                 type="submit"
-                className="w-25 p-2 border roundedw-full bg-blue-400 text-white p-2 rounded hover:bg-blue-700 disabled:opacity-50"
+                className="w-25 border roundedw-full bg-blue-400 text-white p-2 rounded hover:bg-blue-700 disabled:opacity-50"
               >
                 Search
               </button>
@@ -227,24 +248,3 @@ export default function SearchClaim() {
   );
 }
 
-/*<div>
-              <label className="block font-medium">Email</label>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                className="w-full p-2 border rounded"
-                required
-              />
-            </div>
-            <div>
-              <label className="block font-medium">Message</label>
-              <textarea
-                name="message"
-                value={formData.message}
-                onChange={handleChange}
-                className="w-full p-2 border rounded"
-                required
-              ></textarea>
-            </div> */

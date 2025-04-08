@@ -6,5 +6,7 @@ export interface ExpenseClaimDetail {
     to:string;
     client:string;
     amount:string;
-    receipt:string;
+    receiptFile:string | File;
+    receiptName:string;
+    requestId?:string;
 }

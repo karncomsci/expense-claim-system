@@ -1,4 +1,4 @@
-import { SheetDataRow } from "../models/SheetDataRow";
+import { ExpenseClaim } from "../models/ExpenseClaim";
 import { Categories } from "../models/Categories"; // Import Categories type
 import { ClientNames } from "../models/ClientNames"; // Import ClientNames type
 import { Months } from "../models/Months";
@@ -7,27 +7,30 @@ import { Years } from "../models/Years";
 import { Employees } from "../models/Employees";
 
 const mapData = () => {
-  const mapSheetData = (data: string[][]): SheetDataRow[] => {
+  const mapSheetData = (data: string[][]): ExpenseClaim[] => {
     const headers = data[0]; // First row contains headers
     const rows = data.slice(1); // Remaining rows are data rows
 
     return rows.map((row) => {
       // Create an object for each row, using the headers for keys
-      const mappedRow: SheetDataRow = {
+      const mappedRow: ExpenseClaim = {
         requestId: row[0] ?? "",
-        requestDate: row[1] ?? "",
-        topic: row[2] ?? "",
-        detail: row[3] ?? "",
-        category: row[4] ?? "",
-        clientName: row[5] ?? "",
-        requester: row[6] ?? "",
-        requesterEmail: row[7] ?? "",
-        approver: row[8] ?? "",
-        approverEmail: row[9] ?? "",
-        receipt: row[10] ?? "",
-        approvalDate: row[11] ?? "", // Check if Approval Date is undefined
-        status: row[12] ?? "",
-        rejectReason: row[13] ?? "", // Check if Reject Reason is undefined
+        topic: row[1] ?? "",
+        detail: row[2] ?? "",
+        claimDate: row[3] ?? "",
+        employeeId: row[4] ?? "",
+        employeeCompany: row[5] ?? "",
+        approverId: row[6] ?? "",
+        totalAmount: row[7] ?? "",
+        status: row[8] ?? "",
+        rejectReason: row[9] ?? "",
+        requester: row[10] ?? "",
+        requesterEmail: row[11] ?? "",
+        approver: row[12] ?? "",
+        approverEmail: row[13] ?? "",
+        claimedMonth: row[14] ?? "",
+        claimedYear: row[15] ?? "",
+
       };
 
       return mappedRow;
@@ -126,7 +129,27 @@ const mapData = () => {
         return mappedRow;
       });
   };
+  const mapSheetDataUserLogin = (data: string[][]): Employees[] => {
+    //const headers = data[0]; // First row contains headers
+    const rows = data.slice(1); // Remaining rows are data rows
 
+    return rows
+      .map((row) => {
+        // Create an object for each row, using the headers for keys
+        const mappedRow: Employees = {
+          employeeId: row[0] ?? "",
+          employeeName: row[1] ?? "",
+          firstName: row[2] ?? "",
+          lastName: row[3] ?? "",
+          email: row[4] ?? "",
+          position: row[5] ?? "",
+          employeeStatus: row[6] ?? "",
+        };
+
+        return mappedRow;
+      });
+  };
+  
   return {
     mapSheetData,
     mapSheetDataCategory,
@@ -134,7 +157,8 @@ const mapData = () => {
     mapSheetDataApprover,
     mapSheetDataMonth,
     mapSheetDataYear,
-    mapSheetDataEmployee
+    mapSheetDataEmployee,
+    mapSheetDataUserLogin,
   };
 };
 

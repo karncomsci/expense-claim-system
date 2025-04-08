@@ -1,16 +1,21 @@
 "use server"
-import { SheetDataRow } from "@/app/models/SheetDataRow";
+import { ExpenseClaim } from "@/app/models/ExpenseClaim";
 import { google } from "googleapis";
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import dotenv from "dotenv";
 
-dotenv.config({ path: ".env.production" });
+if(process.env.NODE_ENV == 'production'){
+    dotenv.config({ path: ".env.production" });
+}else{
+    dotenv.config({ path: ".env.local" });
+}
 
 interface Prop {
-    rowData: SheetDataRow[]
+    formData: ExpenseClaim
+    totalAmount: string
 }
-export async function getSheetSaveData({rowData} : Prop) { 
+export async function saveRequestExpenseClaimData({formData,totalAmount} : Prop) { 
     //const credentialsPath = join(process.cwd(), './api-key.json');
     //const credentials = JSON.parse(readFileSync(credentialsPath, 'utf-8'));
 
@@ -29,7 +34,21 @@ export async function getSheetSaveData({rowData} : Prop) {
 
 const glSheets = google.sheets({ version: "v4", auth: glAuth });
 
-const formattedData = rowData.map(row => {
+const saveExpenseClaim = {
+    requestId: formData.requestId,
+    topic: formData.topic,
+    detail: formData.detail,
+    claimDate: formData.claimDate,
+    //claimedMonth: formData.claimedMonth,
+    //claimedYear: formData.claimedYear,
+    employeeId: formData.employeeId,
+    employeeCompany: formData.employeeCompany,
+    approverId: formData.approverId,
+    totalAmount: totalAmount,
+    status: formData.status,
+    rejectReason: formData.rejectReason
+}
+/*const formattedData = rowData.map(row => {
     const orderedRow = {
         requestId: row.requestId,
         requestDate: row.requestDate,
@@ -47,13 +66,13 @@ const formattedData = rowData.map(row => {
         rejectReason: row.rejectReason
     };
     return Object.values(orderedRow);
-});
+}); */
 try {
     const data = await glSheets.spreadsheets.values.append({
         spreadsheetId: process.env.GOOGLE_SHEET_ID_ACTION,
         range: 'Document',
         valueInputOption: "RAW",
-        requestBody: { values: formattedData },
+        requestBody: { values: [Object.values(saveExpenseClaim)] },
     });
 
     if (data.status === 200) {

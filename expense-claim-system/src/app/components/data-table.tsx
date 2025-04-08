@@ -1,16 +1,24 @@
 import { useRouter } from 'next/navigation'
-import { FileSearch,Pencil } from 'lucide-react'
-import { SheetDataRow } from '@/app/models/SheetDataRow'
+import { FileSearch,Pencil,Trash  } from 'lucide-react'
+import { ExpenseClaim } from '@/app/models/ExpenseClaim'
+import { Employees } from '@/app/models/Employees'
+
 
 interface ConditionalProps {
     showWhen: boolean;
     children: React.ReactNode;
 }
 interface DataTableProps {
-    rowData: SheetDataRow[]; // Accept an array of SheetDataRow objects
+    rowData: ExpenseClaim[];
+    user: Employees; // Accept an array of SheetDataRow objects
+    onClickDeleteItemById: (item: string) => void;
 }
-export default function DataTable({ rowData }: DataTableProps) {
+export default function DataTable({ rowData, user , onClickDeleteItemById }: DataTableProps) {
     const router = useRouter()
+
+    if(!user){
+        user = {} as Employees;
+    }
     return (
        
         <div className="max-w-10xl mx-auto mt-2 p-6 bg-white shadow-lg rounded-lg">   
@@ -19,23 +27,21 @@ export default function DataTable({ rowData }: DataTableProps) {
           <thead className="bg-blue-400 text-white border-1">
             <tr>
             <th className="px-6 py-3 text-left border-1">No.</th>
-              <th className="px-6 py-3 text-left border-1">Request Date</th>
+              <th className="px-6 py-3 text-left border-1">Claim Date</th>
               <th className="px-6 py-3 text-left border-1">Topic</th>
               <th className="px-6 py-3 text-left border-1">Detail</th>
-              <th className="px-6 py-3 text-left border-1">Category</th>
-              <th className="px-6 py-3 text-left border-1">Client Name</th>
-              <th className="px-6 py-3 text-left border-1">Requester</th>
+              <th className="px-6 py-3 text-left border-1">Employee</th>
+              <th className="px-6 py-3 text-left border-1">Employee Company</th>
               <th className="px-6 py-3 text-left border-1">Approver</th>
-              <th className="px-6 py-3 text-left border-1">Receipt</th>
-              <th className="px-6 py-3 text-left border-1">Approval Date</th>
               <th className="px-6 py-3 text-left border-1">Status</th>
               <th className="px-6 py-3 text-left border-1">Reject Reason</th>
+              <th className="px-6 py-3 text-left border-1">Total Amount</th>
               <th className="px-6 py-3 text-left border-1">Action</th>
             </tr>
           </thead>
           <tbody>
           {rowData.map((item, index) => (
-            <Conditional showWhen={item.status == "Pending Approve"}  key={index}> 
+            <Conditional showWhen={item.status == "Pending Approve" && item.employeeId == user.employeeId}  key={index}>
               <tr 
                 key={index}
                 className="hover:bg-gray-50 border-gray-300 border-1"
@@ -45,7 +51,7 @@ export default function DataTable({ rowData }: DataTableProps) {
                   {index + 1}
                 </td>
                 <td className="px-6 py-4 text-gray-700 border-gray-300 border-1">
-                  {item.requestDate}
+                  {item.claimDate}
                 </td>
                 <td className="px-6 py-4 text-gray-700 border-gray-300 border-1">
                   {item.topic}
@@ -54,22 +60,13 @@ export default function DataTable({ rowData }: DataTableProps) {
                   {item.detail}
                 </td>
                 <td className="px-6 py-4 text-gray-700 border-gray-300 border-1">
-                  {item.category}
+                  {item.employeeId}
                 </td>
                 <td className="px-6 py-4 text-gray-700 border-gray-300 border-1">
-                  {item.clientName}
+                  {item.employeeCompany}
                 </td>
                 <td className="px-6 py-4 text-gray-700 border-gray-300 border-1">
-                  {item.requester}
-                </td>
-                <td className="px-6 py-4 text-gray-700 border-gray-300 border-1">
-                  {item.approver}
-                </td>
-                <td className="px-6 py-4 text-gray-700 border-gray-300 border-1">
-                  {item.receipt}
-                </td>
-                <td className="px-6 py-4 text-gray-700 border-gray-300 border-1">
-                  {item.approvalDate}
+                  {item.approverId}
                 </td>
                 <td className="px-6 py-4 text-gray-700 border-gray-300 border-1">
                   {item.status}
@@ -78,17 +75,24 @@ export default function DataTable({ rowData }: DataTableProps) {
                   {item.rejectReason}
                 </td>
                 <td className="px-6 py-4 text-gray-700 border-gray-300 border-1">
+                  {item.totalAmount}
+                </td>
+                <td className="px-6 py-4 text-gray-700 border-gray-300 border-1">
                   <div className="flex justify-center align-items-center space-x-1">
                     <button className="p-2 rounded bg-blue-300 hover:bg-blue-500 transition">
                       <FileSearch className="w-5 h-5 text-white" />
                     </button>
-                    <button className="p-2 rounded bg-red-300 hover:bg-red-500 transition">
+                    <button className="p-2 rounded bg-gray-300 hover:bg-gray-500 transition">
                       <Pencil className="w-5 h-5 text-white" />
+                    </button>
+                    <button onClick={ () => onClickDeleteItemById( item.requestId ? item.requestId : "" ) } className="p-2 rounded bg-red-300 hover:bg-red-500 transition">
+                      <Trash className="w-5 h-5 text-white" />
                     </button>
                   </div>
                 </td>
               </tr>
               </Conditional>
+              
             ))}
           </tbody>
         </table>

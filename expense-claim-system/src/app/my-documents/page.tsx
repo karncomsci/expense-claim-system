@@ -1,35 +1,77 @@
-"use client"
+"use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import SearchClaim from "@/app/components/search-claim";
+import SearchExpenseClaim from "@/app/components/search-expense-claim";
 import DataTable from "@/app/components/data-table";
-import { getSheetData } from "@/app/api/google-sheets.action";
-import { SheetDataRow } from "@/app/models/SheetDataRow";
+import { ExpenseClaim } from "@/app/models/ExpenseClaim";
+import { Employees } from "@/app/models/Employees";
 import LayoutMain from "@/app/components/layouts/layout-main";
-import mapData from "@/app/mapper/map-data";
+import { ExpenseClaimService } from "@/app/services/expense-claim-service";
+import { DeleteExpenceClaimById } from "../services/expense-claim-delete-service";
+import { DeleteExpenceClaimDetailById } from "@/app/services/expense-claim-detail-delete-service";
+// Ensure Categories is an array type or adjust its definition if needed
 export default function MyDocuments() {
   const router = useRouter();
-
-  const [data, setData] = useState<SheetDataRow[]>([]);
+  const [dataExpenseClaim, setDataExpenseClaim] = useState<ExpenseClaim[]>([]);
+  const [user, setUser] = useState<Employees>({
+    employeeId: "",
+    employeeName: "",
+    email: "",
+    position: "",
+    firstName: "",
+    lastName: "",
+    employeeStatus: "",
+  });
 
   useEffect(() => {
-    const fetchData = async () => {
-      const res = await getSheetData();
-
-      if (res.data && Array.isArray(res.data)) {
-        const structuredData: SheetDataRow[] = mapData().mapSheetData(res.data as string[][]);
-        setData(structuredData);
-      } else {
-        console.error("Invalid data format received:", res.data);
-      }
-    };
     fetchData();
   }, []);
+  const fetchData = async () => {
+    const expenseClaim = await ExpenseClaimService();
+    if (expenseClaim.document) {
+      setDataExpenseClaim(expenseClaim.document as ExpenseClaim[]);
+    }
+    const getUser = localStorage.getItem("login");
+    if (getUser) {
+      setUser(JSON.parse(getUser) as Employees);
+    }
+  };
+
+  const handleClickDeleteItemById = async (id: string) => {
+    const confirmDelete = window.confirm("Are you sure you want to delete this data?");
+    if (confirmDelete) {
+      DeleteExpenceClaimById(id)
+        .then((res) => {
+          if (res.success) {
+            deleteExpenseClaimDetail(id);
+            alert("Delete item successfully!");
+            fetchData(); // Refresh the data after deletion
+          }
+        })
+        .catch((error) => {
+          console.error("Error deleting item:", error);
+        });
+        
+    }
+  };
+  const deleteExpenseClaimDetail = async (requestId: string) => {
+      if(requestId){
+        DeleteExpenceClaimDetailById(requestId)
+          .then((res) => {
+            if (res.success) {
+              console.log("Delete item :", res.message);
+            }
+          })
+          .catch((error) => {
+            console.error("Error deleting item:", error);
+          });
+      }
+  }
   return (
     <>
       <LayoutMain>
         <div className="container mx-auto p-6 bg-white rounded-lg">
-          <SearchClaim />
+          <SearchExpenseClaim />
           <div className="flex justify-end items-center">
             <button
               type="submit"
@@ -39,7 +81,11 @@ export default function MyDocuments() {
               <p>Add</p>
             </button>
           </div>
-          <DataTable rowData={data} />
+          <DataTable
+            rowData={dataExpenseClaim}
+            user={user}
+            onClickDeleteItemById={handleClickDeleteItemById}
+          />
         </div>
       </LayoutMain>
     </>

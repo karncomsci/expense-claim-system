@@ -4,7 +4,12 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import dotenv from "dotenv";
 
-dotenv.config({ path: ".env.production" });
+
+if(process.env.NODE_ENV == 'production'){
+    dotenv.config({ path: ".env.production" });
+}else{
+    dotenv.config({ path: ".env.local" });
+}
 export async function getSheetMasterData() { 
 //const credentialsPath = join(process.cwd(), './api-key.json');
 //const credentials = JSON.parse(readFileSync(credentialsPath, 'utf-8'));
