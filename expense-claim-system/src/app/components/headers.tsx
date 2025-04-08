@@ -24,14 +24,14 @@ export default function header() {
               </span>
             </a>
           </div>
-          <div className="ml-auto">
+          {/*<div className="ml-auto">
             <button
               onClick={handleLogout}
               className="text-24 font-mono dark:text-white bg-transparent border-none cursor-pointer"
             >
               Logout
             </button>
-          </div>
+          </div> */}
         </div>
       </nav>
     </header>

@@ -67,6 +67,7 @@ export default function MyDocumentsLayout({
             path="./all-documents"
           />
           <hr className="my-3" />
+          <Conditional showWhen={user.employeeStatus === "Admin"}  > 
           <SidebarItem
             icon={<Settings size={20} />}
             text="ตั้งค่า"
@@ -77,6 +78,7 @@ export default function MyDocumentsLayout({
             text="เกี่ยวกับเรา"
             path="./about-us"
           />
+          </Conditional>
         </Sidebar>
         <main className="flex-1">
           <Header />

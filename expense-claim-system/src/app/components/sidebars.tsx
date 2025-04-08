@@ -1,12 +1,11 @@
-"use client"
-import { MoreVertical, ChevronLast, AlignJustify} from "lucide-react"
-import { useContext, createContext, useState, useEffect } from "react"
-import Image from "next/image"
-import img from '@/app/assets/images/nityo-infotech.png'
-import logo from '@/app/assets/images/logo-nityo.png'
-import { useRouter } from 'next/navigation'
-import { isNumber } from "util"
-
+"use client";
+import { MoreVertical, ChevronLast, AlignJustify } from "lucide-react";
+import { useContext, createContext, useState, useEffect } from "react";
+import Image from "next/image";
+import img from "@/app/assets/images/nityo-infotech.png";
+import logo from "@/app/assets/images/logo-nityo.png";
+import { useRouter } from "next/navigation";
+import { isNumber } from "util";
 
 interface SidebarContextProps {
   expanded: boolean;
@@ -14,28 +13,43 @@ interface SidebarContextProps {
 }
 
 const SidebarContext = createContext<SidebarContextProps>({
-    expanded: false,
-    setExpanded: () => {},
+  expanded: false,
+  setExpanded: () => {},
 });
 
 interface SidebarProps {
   children: React.ReactNode;
 }
 export default function Sidebar({ children }: SidebarProps) {
-  const [expanded, setExpanded] = useState(true)
-  
-  
-  
-  
+  const router = useRouter();
+  const [expanded, setExpanded] = useState(true);
+
+  const handleLogout = () => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to logout?"
+    );
+    if (confirmDelete) {
+      // สามารถเพิ่ม logic logout เช่น clear token ได้ที่นี่
+      console.log("User logged out");
+      // Clearing all items from local storage
+      localStorage.clear();
+      router.push("./"); // เปลี่ยนเส้นทางไปที่ page.tsx
+    }
+  };
+
   return (
     <aside className="h-screen">
       <nav className="h-full flex flex-col bg-white border-r shadow-sm">
         <div className="p-4 pb-2 flex justify-between items-center">
-          
-          <Image src={img} alt='' className={`overflow-hidden transition-all ${
+          <Image
+            src={img}
+            alt=""
+            className={`overflow-hidden transition-all ${
               expanded ? "w-32" : "w-0"
             }`}
-             width={80} height={80} />
+            width={80}
+            height={80}
+          />
           <button
             onClick={() => setExpanded((curr) => !curr)}
             className="p-1.5 rounded-lg bg-gray-50 hover:bg-gray-100"
@@ -47,9 +61,19 @@ export default function Sidebar({ children }: SidebarProps) {
         <SidebarContext.Provider value={{ expanded, setExpanded }}>
           <ul className="flex-1 px-3">{children}</ul>
         </SidebarContext.Provider>
-
+        <div className="flex items-center justify-center mb-2 mr-2 ml-2">
+          <button
+            className="text-24 font-mono dark:text-white
+               bg-red-400 border-nonew-20 p-2 border w-full
+                 text-white rounded hover:bg-red-700
+                  disabled:opacity-50"
+            onClick={handleLogout}
+          >
+            Logout
+          </button>
+        </div>
         <div className="border-t flex p-3">
-          <Image src={logo} alt='' className="w-10 h-10 rounded-md"/>
+          <Image src={logo} alt="" className="w-10 h-10 rounded-md" />
           <div
             className={`
               flex justify-between items-center
@@ -58,16 +82,17 @@ export default function Sidebar({ children }: SidebarProps) {
           >
             <div className="leading-4">
               <h4 className="font-semibold">Nityo Infotech</h4>
-              <span className="text-xs text-gray-600">getintouch@nityo.com</span>
+              <span className="text-xs text-gray-600">
+                getintouch@nityo.com
+              </span>
             </div>
             <MoreVertical size={20} />
           </div>
         </div>
       </nav>
     </aside>
-  )
+  );
 }
-
 
 interface SidebarItemProps {
   icon: React.ReactNode;
@@ -78,9 +103,16 @@ interface SidebarItemProps {
   path?: string;
 }
 
-export function SidebarItem({ icon, text, active, alert,count,path }: SidebarItemProps) {
-  const { expanded } = useContext(SidebarContext)
-  const router = useRouter()
+export function SidebarItem({
+  icon,
+  text,
+  active,
+  alert,
+  count,
+  path,
+}: SidebarItemProps) {
+  const { expanded } = useContext(SidebarContext);
+  const router = useRouter();
   return (
     <li
       onClick={() => path && router.push(path)}
@@ -105,7 +137,9 @@ export function SidebarItem({ icon, text, active, alert,count,path }: SidebarIte
       </span>
       {alert && isNumber(count) && (
         <div className="ml-auto">
-        <span className="bg-blue-400 font-bold text-white text-center py-1 px-2 text-xs rounded">{count}</span>
+          <span className="bg-blue-400 font-bold text-white text-center py-1 px-2 text-xs rounded">
+            {count}
+          </span>
         </div>
       )}
 
@@ -122,7 +156,7 @@ export function SidebarItem({ icon, text, active, alert,count,path }: SidebarIte
         </div>
       )}
     </li>
-  )
+  );
 }
 
 /*className={`absolute right-2 w-2 h-2 rounded bg-indigo-400 ${
